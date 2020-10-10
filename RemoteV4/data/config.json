@@ -1,0 +1,17 @@
+{
+"hostName":"garage",
+"MDSNname":"default.example.com",
+"password":"password_default",
+"client_SSID":"xxxxxx",
+"client_password":"yyyyyy",
+"AP_SSID":"AP_SSID_default",
+"AP_password":"AP_password_default",
+"passcode0":"passcode0_default",
+"passcode1":"code",
+"passcode2":"passcode2_default",
+"passcode3":"passcod3_default",
+"function1_gpio":13,
+"function2_gpio":2,
+"function1_high_low":false,
+"function2_high_low":true
+}

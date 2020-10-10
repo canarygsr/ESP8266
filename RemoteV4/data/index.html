@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html charset="UTF-8">
+
+<head>
+  <meta name="viewport">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.js"></script>
+  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.0/bootstrap-table.min.css">
+  <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/superhero/bootstrap.min.css" rel="stylesheet" title="main">
+<style type="text/css">* {
+  box-sizing: border-box;
+}
+
+/* Create two equal columns that floats next to each other */
+.chart_div {
+  float: left;
+  width: 80%;
+  height: 100%;
+  padding: 10px;
+}
+.column20 {
+  float: right;
+  width: 20%;
+  height: 100%;
+  padding: 10px;
+}
+</style>
+  <title>ESP8266 BBQ Monitor</title>
+</head>
+
+<body onload='update_status()'>
+<div class="container-fluid">
+<h1>ESP8266 BBQ Monitor</h1>
+
+<ul class="nav nav-tabs" id="tab">
+	<li class="active"><a data-toggle="tab" href="#tab_settings">Settings</a></li>
+	<li><a data-toggle="tab" href="#tab_status">Status</a></li>
+	<li><a data-toggle="tab" href="#tab_gpio">Current states</a></li>
+	<li><a data-toggle="tab" href="#tab_configuration">Wifi Configuration</a></li>
+</ul>
+</div>
+
+<div class="tab-content">
+<div class="tab-pane fade in active" id="tab_settings">
+<h2>Current Tempreature</h2>
+
+<form action="settings.html" id="Probe_Settings" method="get" name="Probe Settings" target="_self">
+<table class="table">
+	<caption>Probe Settings</caption>
+	<thead>
+		<tr>
+			<th scope="row"></th>
+			<th scope="col">Name</th>
+			<th scope="col">Set Tempreature</th>
+			<th scope="col">Pre warning</th>
+			<th scope="col">OT Warning</th>
+			<th scope="col">Pit Probe</th>
+			<th scope="col">Used</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<th scope="row">Probe 1</th>
+			<td><input class="form-control" id="Probe1Name" name="Probe1Name" type="text" /></td>
+			<td><input class="form-control" id="Probe1SetTemp" name="Probe1SetTemp" type="text" /></td>
+			<td><input class="form-control" id="Probe1PreWarning" name="Probe1PreWarning" type="text" /></td>
+			<td><input class="form-control" id="Probe1OTWarning" name="Probe1OTWarning" type="text" /></td>
+			<td style="text-align: center; vertical-align: middle;"><input id="Probe1PitProbe" name="Probe1PitProbe" type="checkbox" /></td>
+			<td style="text-align: center; vertical-align: middle;"><input id="Probe1Used" name="Probe1Used" type="checkbox" /></td>
+		</tr>
+		<tr>
+			<th scope="row">Probe 2</th>
+			<td><input class="form-control" id="Probe2Name" name="Probe2Name" type="text" /></td>
+			<td><input class="form-control" id="Probe2SetTemp" name="Probe2SetTemp" type="text" /></td>
+			<td><input class="form-control" id="Probe2PreWarning" name="Probe2PreWarning" type="text" /></td>
+			<td><input class="form-control" id="Probe2OTWarning" name="Probe2OTWarning" type="text" /></td>
+			<td style="text-align: center; vertical-align: middle;"><input id="Probe2PitProbe" name="Probe2PitProbe" type="checkbox" /></td>
+			<td style="text-align: center; vertical-align: middle;"><input id="Probe2Used" name="Probe2Used" type="checkbox" /></td>
+		</tr>
+		<tr>
+			<th scope="row">Probe 3</th>
+			<td><input class="form-control" id="Probe3Name" name="Probe3Name" type="text" /></td>
+			<td><input class="form-control" id="Probe3SetTemp" name="Probe3SetTemp" type="text" /></td>
+			<td><input class="form-control" id="Probe3PreWarning" name="Probe3PreWarning" type="text" /></td>
+			<td><input class="form-control" id="Probe3OTWarning" name="Probe3OTWarning" type="text" /></td>
+			<td style="text-align: center; vertical-align: middle;"><input id="Probe3PitProbe" name="Probe3PitProbe" type="checkbox" /></td>
+			<td style="text-align: center; vertical-align: middle;"><input id="Probe3Used" name="Probe3Used" type="checkbox" /></td>
+		</tr>
+		<tr>
+			<th scope="row">Probe 4</th>
+			<td><input class="form-control" id="Probe4Name" name="Probe4Name" type="text" /></td>
+			<td><input class="form-control" id="Probe4SetTemp" name="Probe4SetTemp" type="text" /></td>
+			<td><input class="form-control" id="Probe4PreWarning" name="Probe4PreWarning" type="text" /></td>
+			<td><input class="form-control" id="Probe4OTWarning" name="Probe4OTWarning" type="text" /></td>
+			<td style="text-align: center; vertical-align: middle;"><input id="Probe4PitProbe" name="Probe4PitProbe" type="checkbox" /></td>
+			<td style="text-align: center; vertical-align: middle;"><input id="Probe4Used" name="Probe4Used" type="checkbox" /></td>
+		</tr>
+	</tbody>
+</table>
+<input name="Submit" type="submit" value="Submit" /></form>
+<button id="reset" style="width: 4.4em;background-color:#AAA">Reset</button><br/>
+<button onclick='update_settings()' id="refresh" style="width: 4.4em;background-color:#A9A9A9">Refresh</button>
+</div>
+<div class="tab-pane fade" id="tab_status">
+<h2>Graphs</h2>
+
+<div id="chart_div" style="background-color:#aaa;"></div>
+
+<div class="column20" style="background-color:#bbb;">
+<div class="row">
+<div class="col-xs-4 col-md-4"><ProbeName1></ProbeName1></div>
+<div class="col-xs-4 col-md-4"><ProbeTemp1></ProbeTemp1>&#8451</div>
+<div class="col-xs-4 col-md-4"><div class="span badge"><ProbeUsed1></ProbeUsed1></div>
+</div>
+</div>
+
+<div class="row">
+<div class="col-xs-4 col-md-4"><ProbeName2></ProbeName2></div>
+<div class="col-xs-4 col-md-4"><ProbeTemp2></ProbeTemp2>&#8451</div>
+<div class="col-xs-4 col-md-4"><div class="span badge"><probeused2></probeused2></div>
+</div>
+</div>
+
+<div class="row">
+<div class="col-xs-4 col-md-4"><ProbeName3></ProbeName3></div>
+<div class="col-xs-4 col-md-4"><ProbeTemp3></ProbeTemp3>&#8451</div>
+<div class="col-xs-4 col-md-4"><div class="span badge"><probeused3></probeused3></div>
+</div>
+</div>
+
+<div class="row">
+<div class="col-xs-4 col-md-4"><ProbeName4></ProbeName4></div>
+<div class="col-xs-4 col-md-4"><ProbeTemp4></ProbeTemp4>&#8451</div>
+<div class="col-xs-4 col-md-4"><div class="span badge"><probeused4></probeused4></div>
+</div>
+</div>
+<button><span style="width: 4.4em; background-color:#AAA">Refersh Temp</span></button></div>
+</div>
+<div class="tab-pane fade" id="tab_gpio">
+<h2><span style="background-color:#A9A9A9;">GP</span>IO</h2>
+
+<div class="row">
+<div class="col-xs-4 col-md-4">
+<h4 class="text-left">D5</h4>
+
+<div class="span badge" id="D5_etat">OFF</div>
+</div>
+
+<div class="col-xs-4 col-md-4">
+<div class="button btn btn-success btn-lg" id="D5_On" type="button">ON</div>
+</div>
+
+<div class="col-xs-4 col-md-4">
+<div class="button btn btn-danger btn-lg" id="D5_Off" type="button">OFF</div>
+</div>
+</div>
+
+<div class="row">
+<div class="col-xs-4 col-md-4">
+<h4 class="text-left">D6</h4>
+
+<div class="span badge" id="D6_etat">OFF</div>
+</div>
+
+<div class="col-xs-4 col-md-4">
+<div class="button btn btn-success btn-lg" id="D6_On" type="button">ON</div>
+</div>
+
+<div class="col-xs-4 col-md-4">
+<div class="button btn btn-danger btn-lg" id="D6_Off" type="button">OFF</div>
+</div>
+</div>
+
+<div class="row">
+<div class="col-xs-4 col-md-4">
+<h4 class="text-left">D7</h4>
+
+<div class="span badge" id="D7_etat">OFF</div>
+</div>
+
+<div class="col-xs-4 col-md-4">
+<div class="button btn btn-success btn-lg" id="D7_On" type="button">ON</div>
+</div>
+
+<div class="col-xs-4 col-md-4">
+<div class="button btn btn-danger btn-lg" id="D7_Off" type="button">OFF</div>
+</div>
+</div>
+
+<div class="row">
+<div class="col-xs-4 col-md-4">
+<h4 class="text-left">D8</h4>
+
+<div class="span badge" id="D8_etat">OFF</div>
+</div>
+
+<div class="col-xs-4 col-md-4">
+<div class="button btn btn-success btn-lg" id="D8_On" type="button">ON</div>
+</div>
+
+<div class="col-xs-4 col-md-4">
+<div class="button btn btn-danger btn-lg" id="D8_Off" type="button">OFF</div>
+</div>
+</div>
+</div>
+<div class="tab-pane fade" id="tab_configuration">
+<h2>Configuration</h2>
+
+<div class="btn-group"><button class="btn btn-default" id="labelTheme">Theme</button><button class="btn btn-default dropdown-toggle" data-toggle="dropdown"></button>
+
+<ul class="dropdown-menu">
+	<li><a class="change-style-menu-item" href="#" rel="bootstrap">Boostrap</a></li>
+	<li><a class="change-style-menu-item" href="#" rel="cerulean">Cerulean</a></li>
+	<li><a class="change-style-menu-item" href="#" rel="cosmo">Cosmo</a></li>
+	<li><a class="change-style-menu-item" href="#" rel="cyborg">Cyborg</a></li>
+	<li><a class="change-style-menu-item" href="#" rel="darkly">Darkly</a></li>
+	<li><a class="change-style-menu-item" href="#" rel="flatly">Flatly</a></li>
+	<li><a class="change-style-menu-item" href="#" rel="journal">Journal</a></li>
+	<li><a class="change-style-menu-item" href="#" rel="lumen">Lumen</a></li>
+	<li><a class="change-style-menu-item" href="#" rel="paper">Paper</a></li>
+	<li><a class="change-style-menu-item" href="#" rel="readable">Readable</a></li>
+	<li><a class="change-style-menu-item" href="#" rel="sandstone">Sandstone</a></li>
+	<li><a class="change-style-menu-item" href="#" rel="simplex">Simplex</a></li>
+	<li><a class="change-style-menu-item" href="#" rel="slate">Slate</a></li>
+	<li><a class="change-style-menu-item" href="#" rel="spacelab">Spacelab</a></li>
+	<li><a class="change-style-menu-item" href="#" rel="superhero">Superhero</a></li>
+	<li><a class="change-style-menu-item" href="#" rel="united">United</a></li>
+	<li><a class="change-style-menu-item" href="#" rel="yeti">Yeti </a></li>
+</ul>
+</div>
+</div>
+</div>
+<script>
+   var xmlHttp=createXmlHttpObject(); 
+   function createXmlHttpObject(){ 
+    if(window.XMLHttpRequest){
+       xmlHttp=new XMLHttpRequest(); 
+    }else{
+       xmlHttp=new ActiveXObject('Microsoft.XMLHTTP'); 
+    }
+    return xmlHttp; 
+   }
+  
+   function handleServerResponse(){
+      xmlResponse=xmlHttp.responseXML;
+      ProbeName = xmlResponse.getElementsByTagName('ProbeName');
+      ProbeSetTemp = xmlResponse.getElementsByTagName('ProbeSetTemp');
+      ProbePreWarning = xmlResponse.getElementsByTagName('ProbePreWarning');
+      ProbeOTWarning = xmlResponse.getElementsByTagName('ProbeOTWarning');
+      ProbePitProbe = xmlResponse.getElementsByTagName('ProbePitProbe');
+      ProbeUsed = xmlResponse.getElementsByTagName('ProbeUsed');
+      ProbeTemp = xmlResponse.getElementsByTagName('ProbeTemp');
+   }
+   
+   function update_settings(){ 
+      xmlHttp.open('GET','data/updatevalues.xml',false); 
+      xmlHttp.onreadystatechange=handleServerResponse;  // no brackets?????
+      xmlHttp.send(null);
+    setTimeout('update_settings()',200); 
+    for (i = 0; i < 4; i++) {
+        document.getElementById("Probe" + (i + 1) + "Name").value = ProbeName[i].childNodes[0].nodeValue;
+        document.getElementById("Probe" + (i + 1) + "SetTemp").value = ProbeSetTemp[i].childNodes[0].nodeValue;
+        document.getElementById("Probe" + (i + 1) + "PreWarning").value = ProbePreWarning[i].childNodes[0].nodeValue;
+        document.getElementById("Probe" + (i + 1) + "OTWarning").value = ProbeOTWarning[i].childNodes[0].nodeValue;
+} 
+   }
+  
+    function update_status(){ 
+      xmlHttp.open('PUT','data/updatevalues.xml',false); 
+      xmlHttp.onreadystatechange=handleServerResponse;  // no brackets?????
+      xmlHttp.send(null);
+      setTimeout('update_status()',200); 
+            for (i = 0; i < 4; i++) 
+  {  
+        // note need another loop if want to update more of the same tag name x.length = Tagname for x, x<x.lenth....
+        document.getElementsByTagName("ProbeName" + (i +1))[0].innerHTML = ProbeName[i].childNodes[0].nodeValue;
+        document.getElementsByTagName("ProbeTemp" + (i +1))[0].innerHTML = ProbeTemp[i].childNodes[0].nodeValue;
+        document.getElementsByTagName("ProbeUsed" + (i +1))[0].innerHTML = ProbeUsed[i].childNodes[0].nodeValue;
+
+    }
+   }</script>
+<script src="js/settings.js"></script>
+<script src="https://www.gstatic.com/charts/loader.js" type="text/javascript" ></script>
+<script src="js/tempgraph.js"></script>
+</body>
+
+
+</html>
